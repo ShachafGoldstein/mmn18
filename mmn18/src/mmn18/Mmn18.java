@@ -1,8 +1,9 @@
-import java.util.Iterator;
-
 /**
  * 
  */
+package mmn18;
+
+import java.util.Iterator;
 
 /**
  * @author Guy
