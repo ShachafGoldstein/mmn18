@@ -10,6 +10,8 @@ import java.util.Iterator;
  *
  */
 public class Mmn18 {
+	
+	private static RBTree tree = new RBTree();
 
 	/**
 	 * @param args
@@ -31,10 +33,44 @@ public class Mmn18 {
 	
 	public static String executeAction(String action) {
 		
-		for (char c : action.toCharArray()) {
-			
+		String retMsg = "";
+		String[] vars = action.split(" ");
+		
+		switch (vars[0].charAt(0)) {
+		// Insert new client
+		case '+':
+			retMsg = createClient(vars);
+			break;
+		// Remove client
+		case '-':
+			retMsg = removeClient(vars);
+			break;
+		// Queries
+		case '?':
+			retMsg = query(vars);
+			break;
+		// Change balance
+		default:
+			retMsg = changeBalance(vars);
+			break;
 		}
 		
-		return "";
+		return retMsg;
+	}
+	
+	public static String createClient(String[] vars) {
+		return "lelelele";
+	}
+	
+	public static String removeClient(String[] vars) {
+		return "lelelele";
+	}
+	
+	public static String changeBalance(String[] vars) {
+		return "lelelele";
+	}
+	
+	public static String query(String[] vars) {
+		return "lelelele";
 	}
 }
