@@ -58,8 +58,27 @@ public class Mmn18 {
 		return retMsg;
 	}
 	
+	/**
+	 * 
+	 * @param vars
+	 * @return
+	 */
 	public static String createClient(String[] vars) {
-		return "lelelele";
+		// Create a new client object
+		Client newClient = new Client(
+								vars[1] + ' ' + vars[2],
+								Long.parseLong(vars[3]),
+								Long.parseLong(vars[4]),
+								Long.parseLong(vars[5]));
+		
+		// Insert a new node to the tree with the new client object
+		tree.insert(new RBTreeNode(null,null,null,newClient,RBTreeNodeColor.RED));
+		
+		return String.format("New client %s(%n) was added with account %n and a balance of %n",
+							newClient.getName(),
+							newClient.getId(),
+							newClient.getAccountNumber(),
+							newClient.getBalance());
 	}
 	
 	public static String removeClient(String[] vars) {
