@@ -3,11 +3,26 @@
  */
 package mmn18;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+
 /**
  * @author shachaf
  *
  */
 public class RBTreeNode {
+	
+	public static final RBTreeNode nil;
+	
+	static {
+		nil = new RBTreeNode(null, null, null, null, RBTreeNodeColor.BLACK);
+		
+		nil.setLeft(nil);
+		nil.setRight(nil);
+		nil.setParent(nil);
+	}
+	
 	private RBTreeNode left;
 	private RBTreeNode right;
 	private RBTreeNode parent;
@@ -124,6 +139,48 @@ public class RBTreeNode {
 		this.value = value;
 	}
 	
+	/**
+	 * 
+	 * @return
+	 */
+	public RBTreeNode getGrandpa() {
+		return this.getParent().getParent();
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public RBTreeNode getBrother() {
+		if (isLeftSon()) {
+			return this.getParent().getRight();
+		}
+		else if (isRightSon()){
+			return this.getParent().getLeft();
+		}
+		return nil;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public RBTreeNode getUncle() {
+		return this.getParent().getBrother();
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public boolean isLeftSon() {
+		return (this == this.getParent().getLeft());			
+	}
+	
+	public boolean isRightSon() {
+		return (this == this.getParent().getRight());
+	}
+	
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
@@ -133,4 +190,40 @@ public class RBTreeNode {
 				+ value + ", color=" + color + "]";
 	}
 	
+	 public void printTree(OutputStream out) throws IOException {
+	        if (right != nil) {
+	            right.printTree(out, true, "");
+	        }
+	        printNodeValue(out);
+	        if (left != nil) {
+	            left.printTree(out, false, "");
+	        }
+	    }
+	 
+	    private void printNodeValue(OutputStream out) throws IOException {
+	        if (this.equals(nil)) {
+	            out.write("NIL".getBytes());
+	        } else {
+	            out.write((getKey()+""+getColor().name().charAt(0)).getBytes());
+	        }
+	        out.write('\n');
+	    }
+	    
+	    // use string and not stringbuffer on purpose as we need to change the indent at each recursion
+	    private void printTree(OutputStream out, boolean isRight, String indent) throws IOException {
+	        if (right != nil) {
+	            right.printTree(out, true, indent + (isRight ? "        " : " |      "));
+	        }
+	        out.write(indent.getBytes());
+	        if (isRight) {
+	            out.write(" /".getBytes());
+	        } else {
+	            out.write(" \\".getBytes());
+	        }
+	        out.write("----- ".getBytes());
+	        printNodeValue(out);
+	        if (left != nil) {
+	            left.printTree(out, false, indent + (isRight ? " |      " : "        "));
+	        }
+	    }
 }
