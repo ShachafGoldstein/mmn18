@@ -43,9 +43,10 @@ public class RBTree {
 		x.setParent(y.getParent());
 		
 		if (y != node) {
-			Client temp = node.getValue();
+			//Client temp = node.getValue();
 			node.setValue(y.getValue());
-			y.setValue(temp);
+			//y.setValue(temp);
+			node.setMax(y.getMax());
 		}
 		
 		if (y.getParent() == RBTreeNode.nil) {
@@ -60,6 +61,7 @@ public class RBTree {
 			}
 		}
 		
+		setMax(x);
 		setMax(x.getParent());
 		
 		if (y.getColor() == RBTreeNodeColor.BLACK) {
@@ -293,6 +295,7 @@ public class RBTree {
 		oldRight.setLeft(axis);
 		axis.setParent(oldRight);
 		
+		setMax(axis);
 		setMax(oldRight);
 	}
 	
@@ -324,6 +327,7 @@ public class RBTree {
 		oldLeft.setRight(axis);
 		axis.setParent(oldLeft);
 		
+		setMax(axis);
 		setMax(oldLeft);
 	}
 	
@@ -332,8 +336,6 @@ public class RBTree {
 	 */
 	public void setRoot(RBTreeNode root) {
 		this.root = root;
-		
-		//setMax(root);
 	}
 	
 	/**
@@ -436,7 +438,10 @@ public class RBTree {
 	
 	private void setMax(RBTreeNode node) {
 		RBTreeNode childMax = getChildMax(node);
-		if (childMax != RBTreeNode.nil) {
+		if (childMax == RBTreeNode.nil) {
+			node.setMax(node);
+		}
+		else {
 			node.setMax((node.getValue().getBalance() > childMax.getValue().getBalance()) ? node : childMax);
 		} 
 	}
