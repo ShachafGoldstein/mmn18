@@ -3,8 +3,6 @@
  */
 package mmn18;
 
-import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 
 /**
@@ -57,12 +55,16 @@ public class RBTree {
 		}
 		
 		if (y != node) {
+			Client temp = node.getValue();
 			node.setValue(y.getValue());
+			y.setValue(temp);
 		}
 		
 		if (y.getColor() == RBTreeNodeColor.BLACK) {
-			deleteFixup(node);
+			deleteFixup(x);
 		}
+		
+		RBTreeNode.nil.setParent(RBTreeNode.nil);
 		
 		return y;
 	}
@@ -77,10 +79,11 @@ public class RBTree {
 		while (x != root && x.getColor() == RBTreeNodeColor.BLACK) {
 			RBTreeNode w;
 			
-			if (x == x.getParent().getLeft()) {
+			if (x.isLeftSon()) {
 				w = x.getParent().getRight();
 				
 				if (w.getColor() == RBTreeNodeColor.RED) {
+					w.setColor(RBTreeNodeColor.BLACK);
 					x.getParent().setColor(RBTreeNodeColor.RED);
 					leftRotate(x.getParent());
 					w = x.getParent().getRight();
@@ -91,22 +94,26 @@ public class RBTree {
 					w.setColor(RBTreeNodeColor.RED);
 					x = x.getParent();
 				}
-				else if (w.getRight().getColor() == RBTreeNodeColor.BLACK) {
-					w.getLeft().setColor(RBTreeNodeColor.BLACK);
-					rightRotate(w);
-					w = x.getParent().getRight();
+				else {
+					if (w.getRight().getColor() == RBTreeNodeColor.BLACK) {
+						w.getLeft().setColor(RBTreeNodeColor.BLACK);
+						w.setColor(RBTreeNodeColor.RED);
+						rightRotate(w);
+						w = x.getParent().getRight();
+					}
+			
+					w.setColor(x.getParent().getColor());
+					x.getParent().setColor(RBTreeNodeColor.BLACK);
+					w.getRight().setColor(RBTreeNodeColor.BLACK);
+					leftRotate(x.getParent());
+					x = root;
 				}
-				
-				w.setColor(x.getParent().getColor());
-				x.getParent().setColor(RBTreeNodeColor.BLACK);
-				w.getRight().setColor(RBTreeNodeColor.BLACK);
-				leftRotate(x.getParent());
-				x = root;
 			}
 			else {
 				w = x.getParent().getLeft();
 				
 				if (w.getColor() == RBTreeNodeColor.RED) {
+					w.setColor(RBTreeNodeColor.BLACK);
 					x.getParent().setColor(RBTreeNodeColor.RED);
 					rightRotate(x.getParent());
 					w = x.getParent().getLeft();
@@ -117,17 +124,20 @@ public class RBTree {
 					w.setColor(RBTreeNodeColor.RED);
 					x = x.getParent();
 				}
-				else if (w.getLeft().getColor() == RBTreeNodeColor.BLACK) {
-					w.getRight().setColor(RBTreeNodeColor.BLACK);
-					leftRotate(w);
-					w = x.getParent().getLeft();
-				}
+				else {
+					if (w.getLeft().getColor() == RBTreeNodeColor.BLACK) {
+						w.getRight().setColor(RBTreeNodeColor.BLACK);
+						w.setColor(RBTreeNodeColor.RED);
+						leftRotate(w);
+						w = x.getParent().getLeft();
+					}
 				
-				w.setColor(x.getParent().getColor());
-				x.getParent().setColor(RBTreeNodeColor.BLACK);
-				w.getLeft().setColor(RBTreeNodeColor.BLACK);
-				rightRotate(x.getParent());
-				x = root;
+					w.setColor(x.getParent().getColor());
+					x.getParent().setColor(RBTreeNodeColor.BLACK);
+					w.getLeft().setColor(RBTreeNodeColor.BLACK);
+					rightRotate(x.getParent());
+					x = root;
+				}
 			}
 		}
 		
@@ -231,6 +241,26 @@ public class RBTree {
 		
 		root.setColor(RBTreeNodeColor.BLACK);
 	}
+	
+	/**
+	 * 
+	 * @param node
+	 * @return
+	 */
+	public RBTreeNode predecessor(RBTreeNode node) {
+		if (node.getLeft() != RBTreeNode.nil) {
+			return treeMaximum(node.getLeft());
+		}
+		
+		RBTreeNode predecessor = node.getParent(), x = node;
+		
+		while (predecessor != RBTreeNode.nil && x == predecessor.getLeft()) {
+			x = predecessor;
+			predecessor = predecessor.getParent();
+		}
+		
+		return predecessor;
+	}
 	/**
 	 * 
 	 * @param axis
@@ -262,26 +292,6 @@ public class RBTree {
 	
 	/**
 	 * 
-	 * @param node
-	 * @return
-	 */
-	public RBTreeNode predecessor(RBTreeNode node) {
-		if (node.getLeft() != RBTreeNode.nil) {
-			return treeMaximum(node.getLeft());
-		}
-		
-		RBTreeNode predecessor = node.getParent(), x = node;
-		
-		while (predecessor != RBTreeNode.nil && x == predecessor.getLeft()) {
-			x = predecessor;
-			predecessor = predecessor.getParent();
-		}
-		
-		return predecessor;
-	}
-	
-	/**
-	 * 
 	 * @param axis
 	 */
 	private void rightRotate(RBTreeNode axis) {
@@ -298,15 +308,14 @@ public class RBTree {
 		if (axis.getParent() == RBTreeNode.nil) {
 			setRoot(oldLeft);
 		}
-		else if (axis.isLeftSon()) {
-			axis.getParent().setLeft(oldLeft);
+		else if (axis.isRightSon()) {
+			axis.getParent().setRight(oldLeft);
 		}
 		else {
-			axis.getParent().setRight(oldLeft);
+			axis.getParent().setLeft(oldLeft);
 		}
 		
 		oldLeft.setRight(axis);
-		
 		axis.setParent(oldLeft);
 	}
 	
@@ -383,10 +392,10 @@ public class RBTree {
 	 * @return
 	 */
 	private RBTreeNode treeMaximum(RBTreeNode node) {
-		RBTreeNode max = RBTreeNode.nil;
+		RBTreeNode max = node;
 		
-		while (node.getRight() != RBTreeNode.nil) {
-			max = node.getRight();
+		while (max.getRight() != RBTreeNode.nil) {
+			max = max.getRight();
 		}
 		
 		return max;
@@ -398,10 +407,10 @@ public class RBTree {
 	 * @return
 	 */
 	private RBTreeNode treeMinimum(RBTreeNode node) {
-		RBTreeNode min = RBTreeNode.nil;
+		RBTreeNode min = node;
 		
-		while (node.getLeft() != RBTreeNode.nil) {
-			min = node.getLeft();
+		while (min.getLeft() != RBTreeNode.nil) {
+			min = min.getLeft();
 		}
 		
 		return min;
@@ -412,8 +421,7 @@ public class RBTree {
 	 * @param accountNumber
 	 * @return
 	 */
-	public RBTreeNode searchByKey(long accountNumber)
-	{
+	public RBTreeNode searchByKey(long accountNumber) {
 		RBTreeNode node = root;
 		
 		while (node != RBTreeNode.nil && node.getKey() != accountNumber)
@@ -429,5 +437,14 @@ public class RBTree {
 		}
 		
 		return node;
+	}
+	
+	public String negativeBalances(RBTreeNode node) {
+		
+		if (node == RBTreeNode.nil) {
+			return ""; 
+		}
+		
+		return (node.getValue().getBalance() < 0 ? node.toString() : "") + negativeBalances(node.getLeft()) + negativeBalances(node.getRight());
 	}
 }

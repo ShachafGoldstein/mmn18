@@ -4,7 +4,6 @@
 package mmn18;
 
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 
 /**
  * @author Guy
@@ -28,28 +27,36 @@ public class Mmn18 {
 					+	"? 1\n";
 		
 		input = "+ JOHN DOE 123456789 1 300\n"
-			+	"+ JOHN DOE 023456789 2 1000\n"
-			+	"+ JOHN DOE 023456789 10 1000\n"
-			+	"+ JOHN DOE 023456789 6 1000\n"
-			+	"+ JOHN DOE 023456789 4 1000\n"
-			+	"+ JOHN DOE 023456789 16 1000\n"
-			+	"+ JOHN DOE 023456789 8 1000\n"
-			+	"+ JOHN DOE 023456789 25 1000\n"
-			+	"+ JOHN DOE 023456789 3 1000\n"
-			+	"+ JOHN DOE 023456789 20 1000\n";
+			+	"+ JOHN DOE 023456789 2 2500\n"
+			+	"+ JOHN DOE 023456789 10 10000\n"
+			+	"+ JOHN DOE 023456789 6 6000\n"
+			+	"+ JOHN DOE 023456789 4 400\n"
+			+	"+ JOHN DOE 023456789 16 1600\n"
+			+	"+ JOHN DOE 023456789 8 -5000\n"
+			+	"+ JOHN DOE 023456789 25 -600\n"
+			+	"+ JOHN DOE 023456789 3 1080\n"
+			+	"+ JOHN DOE 023456789 20 1500\n"
+			+	"- 16\n"
+			+	"- 8\n"
+			+	"- 2\n"
+			+ 	"JOHN DOE 1 -1000\n"
+			+	"- 6\n"
+			+	"? 25\n"
+			+	"? MINUS\n"
+			+	"? MAX\n";
 		
 		for (String s : input.split("\n")) {
 			System.out.println(executeAction(s));
 		}
-		
-		System.out.println(tree.toLevelString());
-		
+
 		try {
 			tree.getRoot().printTree(System.out);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+		//System.out.println(tree.toLevelString());
 	}
 	
 	public static String executeAction(String action) {
@@ -147,16 +154,15 @@ public class Mmn18 {
 		
 		switch (vars[1].toUpperCase()) {
 			case "MINUS":
-				//TODO return all negatives
-				retMsg = "Not implemented yet - minus";
+				retMsg = tree.negativeBalances(tree.getRoot());
 				break;
 				
 			case "MAX":
-				retMsg = "Maximum balance of clients is " + tree.getRoot().getMax().getValue().getBalance();
+				retMsg = "not implemented";//"Maximum balance of clients is " + tree.getRoot().getMax().getValue().getBalance();
 				break;
 				
 			default:
-				RBTreeNode node = tree.searchByKey(Long.parseLong(vars[2]));
+				RBTreeNode node = tree.searchByKey(Long.parseLong(vars[1]));
 				retMsg = String.format("Client %s(%d), with account %d, has a balance of %d",
 						node.getValue().getName(),
 						node.getValue().getId(),

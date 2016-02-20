@@ -186,8 +186,7 @@ public class RBTreeNode {
 	 */
 	@Override
 	public String toString() {
-		return "RBTreeNode [left=" + left + ", right=" + right + ", parent=" + parent + ", max=" + max + ", value="
-				+ value + ", color=" + color + "]";
+		return (this == nil) ? "NIL" : "" + value;
 	}
 	
 	 public void printTree(OutputStream out) throws IOException {

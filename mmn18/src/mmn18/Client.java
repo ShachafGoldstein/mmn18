@@ -88,8 +88,7 @@ public class Client {
 	 */
 	@Override
 	public String toString() {
-		return "Client [name=" + name + ", id=" + id + ", accountNumber=" + accountNumber + ", balance=" + balance
-				+ "]";
+		return name + "(" + id + ") - " + accountNumber + " +++ " + balance + "$\n";
 	}
 	
 	/**
