@@ -58,9 +58,9 @@ public class RBTree {
 			else {
 				y.getParent().setRight(x);
 			}
-			
-			setMax(x.getParent());
 		}
+		
+		setMax(x.getParent());
 		
 		if (y.getColor() == RBTreeNodeColor.BLACK) {
 			deleteFixup(x);
