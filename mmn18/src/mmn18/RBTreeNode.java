@@ -5,7 +5,6 @@ package mmn18;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 
 /**
  * @author shachaf
@@ -44,6 +43,7 @@ public class RBTreeNode {
 		this.parent = parent;
 		this.value = value;
 		this.color = color;
+		this.max = this;
 	}
 
 	/**
@@ -189,40 +189,40 @@ public class RBTreeNode {
 		return (this == nil) ? "NIL" : "" + value;
 	}
 	
-	 public void printTree(OutputStream out) throws IOException {
-	        if (right != nil) {
-	            right.printTree(out, true, "");
-	        }
-	        printNodeValue(out);
-	        if (left != nil) {
-	            left.printTree(out, false, "");
-	        }
-	    }
-	 
-	    private void printNodeValue(OutputStream out) throws IOException {
-	        if (this.equals(nil)) {
-	            out.write("NIL".getBytes());
-	        } else {
-	            out.write((getKey()+""+getColor().name().charAt(0)).getBytes());
-	        }
-	        out.write('\n');
-	    }
-	    
-	    // use string and not stringbuffer on purpose as we need to change the indent at each recursion
-	    private void printTree(OutputStream out, boolean isRight, String indent) throws IOException {
-	        if (right != nil) {
-	            right.printTree(out, true, indent + (isRight ? "        " : " |      "));
-	        }
-	        out.write(indent.getBytes());
-	        if (isRight) {
-	            out.write(" /".getBytes());
-	        } else {
-	            out.write(" \\".getBytes());
-	        }
-	        out.write("----- ".getBytes());
-	        printNodeValue(out);
-	        if (left != nil) {
-	            left.printTree(out, false, indent + (isRight ? " |      " : "        "));
-	        }
-	    }
+	public void printTree(OutputStream out) throws IOException {
+        if (right != nil) {
+            right.printTree(out, true, "");
+		}
+		printNodeValue(out);
+		if (left != nil) {
+		    left.printTree(out, false, "");
+		        }
+		    }
+		 
+	private void printNodeValue(OutputStream out) throws IOException {
+		if (this.equals(nil)) {
+			out.write("NIL".getBytes());
+		} else {
+		    out.write((getKey()+""+getColor().name().charAt(0)+""+max.getKey()+"-"+max.getValue().getBalance()).getBytes());
+		}
+		out.write('\n');
+		}
+		
+		// use string and not stringbuffer on purpose as we need to change the indent at each recursion
+		private void printTree(OutputStream out, boolean isRight, String indent) throws IOException {
+		    if (right != nil) {
+		        right.printTree(out, true, indent + (isRight ? "        " : " |      "));
+		}
+		out.write(indent.getBytes());
+		if (isRight) {
+		    out.write(" /".getBytes());
+		} else {
+		    out.write(" \\".getBytes());
+		}
+		out.write("----- ".getBytes());
+		printNodeValue(out);
+		if (left != nil) {
+		    left.printTree(out, false, indent + (isRight ? " |      " : "        "));
+		}
+	}
 }

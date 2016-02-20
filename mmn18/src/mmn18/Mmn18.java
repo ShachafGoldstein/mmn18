@@ -47,14 +47,21 @@ public class Mmn18 {
 		
 		for (String s : input.split("\n")) {
 			System.out.println(executeAction(s));
+
+			try {
+				tree.getRoot().printTree(System.out);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 
-		try {
+		/*try {
 			tree.getRoot().printTree(System.out);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
+		} */
 		
 		//System.out.println(tree.toLevelString());
 	}
@@ -158,7 +165,7 @@ public class Mmn18 {
 				break;
 				
 			case "MAX":
-				retMsg = "not implemented";//"Maximum balance of clients is " + tree.getRoot().getMax().getValue().getBalance();
+				retMsg = "Maximum balance of clients is " + tree.getRoot().getMax();
 				break;
 				
 			default:

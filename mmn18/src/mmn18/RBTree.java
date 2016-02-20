@@ -3,8 +3,6 @@
  */
 package mmn18;
 
-import java.util.ArrayList;
-
 /**
  * @author shachaf
  *
@@ -44,20 +42,24 @@ public class RBTree {
 		
 		x.setParent(y.getParent());
 		
-		if (y.getParent() == RBTreeNode.nil) {
-			root = x;
-		}
-		else if (y.isLeftSon()) {
-			y.getParent().setLeft(x);
-		}
-		else {
-			y.getParent().setRight(x);
-		}
-		
 		if (y != node) {
 			Client temp = node.getValue();
 			node.setValue(y.getValue());
 			y.setValue(temp);
+		}
+		
+		if (y.getParent() == RBTreeNode.nil) {
+			setRoot(x);
+		}
+		else {
+			if (y.isLeftSon()) {
+				y.getParent().setLeft(x);
+			}
+			else {
+				y.getParent().setRight(x);
+			}
+			
+			setMax(x.getParent());
 		}
 		
 		if (y.getColor() == RBTreeNodeColor.BLACK) {
@@ -181,6 +183,8 @@ public class RBTree {
 			y.setRight(node);
 		}
 		
+		setMax(y);
+		
 		node.setLeft(RBTreeNode.nil);
 		node.setRight(RBTreeNode.nil);
 		node.setColor(RBTreeNodeColor.RED);
@@ -206,14 +210,16 @@ public class RBTree {
 					z.getGrandpa().setColor(RBTreeNodeColor.RED);
 					z = z.getGrandpa();
 				}
-				else if (!z.isLeftSon()) {
-					z = z.getParent();
-					leftRotate(z);
-				}
+				else {
+					if (z.isRightSon()) {
+						z = z.getParent();
+						leftRotate(z);
+					}
 				
-				z.getParent().setColor(RBTreeNodeColor.BLACK);
-				z.getGrandpa().setColor(RBTreeNodeColor.RED);
-				rightRotate(z.getGrandpa());
+					z.getParent().setColor(RBTreeNodeColor.BLACK);
+					z.getGrandpa().setColor(RBTreeNodeColor.RED);
+					rightRotate(z.getGrandpa());
+				}
 			}
 			else {
 				RBTreeNode y = z.getGrandpa().getLeft();
@@ -224,17 +230,15 @@ public class RBTree {
 					z.getGrandpa().setColor(RBTreeNodeColor.RED);
 					z = z.getGrandpa();
 				}
-				else if (z.isLeftSon()) {
-					z = z.getParent();
-					rightRotate(z);
-				}
-				
-				if (z.getParent() != RBTreeNode.nil) {
-					z.getParent().setColor(RBTreeNodeColor.BLACK);
-					if (z.getGrandpa() != RBTreeNode.nil) {
-						z.getGrandpa().setColor(RBTreeNodeColor.RED);
-						leftRotate(z.getGrandpa());
+				else {
+					if (z.isLeftSon()) {
+						z = z.getParent();
+						rightRotate(z);
 					}
+				
+					z.getParent().setColor(RBTreeNodeColor.BLACK);
+					z.getGrandpa().setColor(RBTreeNodeColor.RED);
+					leftRotate(z.getGrandpa());
 				}
 			}
 		}
@@ -288,6 +292,8 @@ public class RBTree {
 		
 		oldRight.setLeft(axis);
 		axis.setParent(oldRight);
+		
+		setMax(oldRight);
 	}
 	
 	/**
@@ -317,6 +323,8 @@ public class RBTree {
 		
 		oldLeft.setRight(axis);
 		axis.setParent(oldLeft);
+		
+		setMax(oldLeft);
 	}
 	
 	/**
@@ -324,6 +332,8 @@ public class RBTree {
 	 */
 	public void setRoot(RBTreeNode root) {
 		this.root = root;
+		
+		//setMax(root);
 	}
 	
 	/**
@@ -344,38 +354,6 @@ public class RBTree {
 		}
 		
 		return successor;
-	}
-
-	/**
-	 * 
-	 * @return
-	 */
-	public String toLevelString() {
-		String retval = "";
-		ArrayList<RBTreeNode> l = new ArrayList<RBTreeNode>();
-		l.add(root);
-		boolean b = true;
-		while (b) {
-			boolean allNil = true;
-			ArrayList<RBTreeNode> children = new ArrayList<>(l.size()*2);
-			for (RBTreeNode node : l) {
-				if (node == RBTreeNode.nil) {
-					retval += "nil ";
-					children.add(RBTreeNode.nil);
-					children.add(RBTreeNode.nil);
-				}
-				else {
-					allNil = false;
-					retval += ("" + node.getKey() + node.getColor().name().charAt(0) + " ");
-					children.add(node.getLeft());
-					children.add(node.getRight());
-				}
-			}
-			b = !allNil;
-			retval += '\n';
-			l = children;
-		}
-		return retval;
 	}
 
 	/* (non-Javadoc)
@@ -446,5 +424,20 @@ public class RBTree {
 		}
 		
 		return (node.getValue().getBalance() < 0 ? node.toString() : "") + negativeBalances(node.getLeft()) + negativeBalances(node.getRight());
+	}
+	
+	private RBTreeNode getChildMax(RBTreeNode node) {
+		RBTreeNode leftMax = node.getLeft().getMax(), rightMax = node.getRight().getMax();
+		if (leftMax != RBTreeNode.nil && rightMax != RBTreeNode.nil) {
+			return (leftMax.getValue().getBalance() > rightMax.getValue().getBalance()) ? leftMax : rightMax;
+		}
+		return (leftMax != RBTreeNode.nil) ? leftMax : (rightMax != RBTreeNode.nil) ? rightMax : RBTreeNode.nil;
+	}
+	
+	private void setMax(RBTreeNode node) {
+		RBTreeNode childMax = getChildMax(node);
+		if (childMax != RBTreeNode.nil) {
+			node.setMax((node.getValue().getBalance() > childMax.getValue().getBalance()) ? node : childMax);
+		} 
 	}
 }
