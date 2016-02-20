@@ -3,8 +3,6 @@
  */
 package mmn18;
 
-import java.util.Iterator;
-
 /**
  * @author Guy
  *
@@ -81,15 +79,68 @@ public class Mmn18 {
 							newClient.getBalance());
 	}
 	
+	/**
+	 * 
+	 * @param vars
+	 * @return
+	 */
 	public static String removeClient(String[] vars) {
-		return "lelelele";
+		// Delete by account id
+		RBTreeNode removedNode = tree.delete(new RBTreeNode(null, null, null, new Client(null, 0, Long.parseLong(vars[1]), 0), RBTreeNodeColor.RED));;
+		
+		return String.format("Client %s(%n) with account %n was deleted",
+				removedNode.getValue().getName(),
+				removedNode.getValue().getId(),
+				removedNode.getValue().getAccountNumber());
 	}
 	
+	/**
+	 * 
+	 * @param vars
+	 * @return
+	 */
 	public static String changeBalance(String[] vars) {
-		return "lelelele";
+		// Find node
+		RBTreeNode node = tree.searchByKey(Long.parseLong(vars[2]));
+		
+		// Change the balance
+		node.getValue().addToBalance(Long.parseLong(vars[3]));
+		
+		return String.format("Client %s(%n), with account %n, has changed its balance to %n",
+				node.getValue().getName(),
+				node.getValue().getId(),
+				node.getValue().getAccountNumber(),
+				node.getValue().getBalance());
 	}
 	
+	/**
+	 * 
+	 * @param vars
+	 * @return
+	 */
 	public static String query(String[] vars) {
-		return "lelelele";
+		String retMsg = "";
+		
+		switch (vars[1].toUpperCase()) {
+			case "MINUS":
+				//TODO return all negatives
+				retMsg = "Not implemented yet - minus";
+				break;
+				
+			case "MAX":
+				retMsg = "Maximum balance of clients is " + tree.getRoot().getMax().getValue().getBalance();
+				break;
+				
+			default:
+				RBTreeNode node = tree.searchByKey(Long.parseLong(vars[2]));
+				retMsg = String.format("Client %s(%n), with account %n, has a balance of %n",
+						node.getValue().getName(),
+						node.getValue().getId(),
+						node.getValue().getAccountNumber(),
+						node.getValue().getBalance());
+				break;
+		}
+		
+		return retMsg;
 	}
 }
