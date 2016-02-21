@@ -1,11 +1,9 @@
-/**
- * 
- */
 package mmn18;
 
 /**
- * @author shachaf
+ * @author Shachaf Goldstein & Guy Sahar
  *
+ *	ENUM to help with node color options
  */
 public enum RBTreeNodeColor {
 	RED, BLACK

@@ -1,16 +1,19 @@
-/**
- * 
- */
 package mmn18;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 
 /**
- * @author Guy
+ * @author Shachaf Goldstein & Guy Sahar
  *
+ *	Main class to manage the bank
  */
 public class Mmn18 {
 	
+	/*
+	 * Single reference to the Red-Black tree
+	 */
 	private static RBTree tree = new RBTree();
 
 	/**
@@ -55,6 +58,29 @@ public class Mmn18 {
 				e.printStackTrace();
 			}
 		}
+		
+		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+		
+		// Get input line to parse
+		try {
+			System.out.println("Please write an action and then press ENTER");
+			input = reader.readLine().toUpperCase();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}		
+		
+		while (input != "EXIT")
+		{
+			System.out.println(executeAction(input));
+			
+			// Get input line to parse
+			try {
+				System.out.println("Please write an action and then press ENTER");
+				input = reader.readLine().toUpperCase();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}		
+		}
 
 		/*try {
 			tree.getRoot().printTree(System.out);
@@ -66,6 +92,12 @@ public class Mmn18 {
 		//System.out.println(tree.toLevelString());
 	}
 	
+	/**
+	 * Parse an action string and execute the relevant action
+	 * 
+	 * @param action - Line to parse
+	 * @return - The string result
+	 */
 	public static String executeAction(String action) {
 		
 		String retMsg = "";
@@ -94,9 +126,10 @@ public class Mmn18 {
 	}
 	
 	/**
+	 * Create a new client and add to tree
 	 * 
-	 * @param vars
-	 * @return
+	 * @param vars - Parameters to create from
+	 * @return - The string result
 	 */
 	public static String createClient(String[] vars) {
 		// Create a new client object
@@ -117,14 +150,15 @@ public class Mmn18 {
 	}
 	
 	/**
+	 * Remove a client
 	 * 
-	 * @param vars
-	 * @return
+	 * @param vars - The parameters to delete by
+	 * @return - The string result
 	 */
 	public static String removeClient(String[] vars) {
-		RBTreeNode removedNode = tree.searchByKey(Long.parseLong(vars[1]));
-		// Delete by account id
-		removedNode = tree.delete(removedNode);
+		
+		// Search and delete node
+		RBTreeNode removedNode = tree.delete(tree.searchByKey(Long.parseLong(vars[1])));
 		
 		return String.format("Client %s(%d) with account %d was deleted",
 				removedNode.getValue().getName(),
@@ -133,15 +167,16 @@ public class Mmn18 {
 	}
 	
 	/**
+	 * Change the balance of a client by given value
 	 * 
-	 * @param vars
-	 * @return
+	 * @param vars - The parameters to change by
+	 * @return - The string result
 	 */
 	public static String changeBalance(String[] vars) {
-		// Find node
+		// Find client
 		RBTreeNode node = tree.searchByKey(Long.parseLong(vars[2]));
 		
-		// Change the balance
+		// Change client balance
 		node.getValue().addToBalance(Long.parseLong(vars[3]));
 		
 		return String.format("Client %s(%d), with account %d, has changed its balance to %d",
@@ -152,22 +187,24 @@ public class Mmn18 {
 	}
 	
 	/**
+	 * Query a client balance, all negative balance clients or maximum balance client
 	 * 
-	 * @param vars
-	 * @return
+	 * @param vars - The parameters of the query
+	 * @return - The string result
 	 */
 	public static String query(String[] vars) {
 		String retMsg = "";
 		
 		switch (vars[1].toUpperCase()) {
+			// Get all negative balanced clients
 			case "MINUS":
-				retMsg = tree.negativeBalances(tree.getRoot());
+				retMsg = RBTree.negativeBalances(tree.getRoot());
 				break;
-				
+			// Get maximum balanced client
 			case "MAX":
 				retMsg = "Maximum balance of clients is " + tree.getRoot().getMax();
 				break;
-				
+			// Get balance of a specified client
 			default:
 				RBTreeNode node = tree.searchByKey(Long.parseLong(vars[1]));
 				retMsg = String.format("Client %s(%d), with account %d, has a balance of %d",
