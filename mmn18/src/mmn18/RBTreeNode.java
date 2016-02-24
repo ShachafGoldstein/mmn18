@@ -16,7 +16,7 @@ public class RBTreeNode {
 	public static final RBTreeNode nil;
 
 	/**
-	 * Init NIL node 
+	 * Initialize NIL node 
 	 */
 	static {
 		nil = new RBTreeNode(null, null, null, null, RBTreeNodeColor.BLACK);
@@ -68,7 +68,7 @@ public class RBTreeNode {
 		this.color = color;
 		
 		// Init max to current node at creation
-		max = this;
+		this.max = this;
 	}
 
 	/**
@@ -172,6 +172,60 @@ public class RBTreeNode {
 	public boolean isRightSon() {
 		return (this == getParent().getRight());
 	}
+	
+	/**
+	 * Check if node is nil
+	 * 
+	 * @return True if current node is nil
+	 */
+	public boolean isNil() {
+		return this == nil;
+	}
+	
+	/**
+	 * Checks if node is black
+	 * 
+	 * @return True if node is black
+	 */
+	public boolean isBlack() {
+		return (getColor() == RBTreeNodeColor.BLACK);
+	}
+	
+	/**
+	 * Checks if node is red
+	 * 
+	 * @return True if node is red
+	 */
+	public boolean isRed() {
+		return (getColor() == RBTreeNodeColor.RED);
+	}
+	
+	/**
+	 * Check if node has a left son
+	 * 
+	 * @return True if left son isn't nil
+	 */
+	public boolean hasLeftSon() {
+		return !getLeft().isNil();
+	}
+	
+	/**
+	 * Check if node has a right son
+	 * 
+	 * @return True if right son isn't nil
+	 */
+	public boolean hasRightSon() {
+		return !getRight().isNil();
+	}
+	
+	/**
+	 * Check if node has a parent
+	 * 
+	 * @return True if parent isn't nil
+	 */
+	public boolean hasParent() {
+		return !getParent().isNil();
+	}
 
 	private void printNodeValue(OutputStream out) throws IOException {
 		if (equals(nil)) {
@@ -259,6 +313,20 @@ public class RBTreeNode {
 	public void setValue(Client value) {
 		this.value = value;
 	}
+	
+	/**
+	 * Set node's color to black
+	 */
+	public void setBlack() {
+		this.setColor(RBTreeNodeColor.BLACK);
+	}
+	
+	/**
+	 * Set node's color to red
+	 */
+	public void setRed() {
+		this.setColor(RBTreeNodeColor.RED);
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -267,6 +335,6 @@ public class RBTreeNode {
 	 */
 	@Override
 	public String toString() {
-		return (this == nil) ? "NIL" : "" + value;
+		return (this.isNil()) ? "NIL" : "" + value;
 	}
 }

@@ -41,7 +41,7 @@ public class Mmn18 {
 			+	"+ JOHN DOE 023456789 20 1500\n"
 			+	"- 16\n"
 			+	"- 8\n"
-			+	"- 2\n"
+			+	"- 10\n"
 			+ 	"JOHN DOE 1 -1000\n"
 			+	"- 6\n"
 			+	"? 25\n"
@@ -50,13 +50,13 @@ public class Mmn18 {
 		
 		for (String s : input.split("\n")) {
 			System.out.println(executeAction(s));
+		}
 
-			try {
-				tree.getRoot().printTree(System.out);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+		try {
+			tree.getRoot().printTree(System.out);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		
 		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
@@ -69,9 +69,16 @@ public class Mmn18 {
 			e.printStackTrace();
 		}		
 		
-		while (input != "EXIT")
+		while (!"EXIT".equals(input.toUpperCase()))
 		{
 			System.out.println(executeAction(input));
+
+			try {
+				tree.getRoot().printTree(System.out);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			
 			// Get input line to parse
 			try {

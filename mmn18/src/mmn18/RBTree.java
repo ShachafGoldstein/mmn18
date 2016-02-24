@@ -10,18 +10,20 @@ public class RBTree {
 	/**
 	 * Get the max relative to children
 	 * 
-	 * @param node
-	 *            - current node to check against
+	 * @param node - current node to check against
 	 * @return - The max node
 	 */
 	private static RBTreeNode getChildMax(RBTreeNode node) {
-		RBTreeNode leftMax = node.getLeft().getMax(), rightMax = node.getRight().getMax();
+		RBTreeNode leftMax 	= node.getLeft().getMax(),
+				   rightMax = node.getRight().getMax();
 
-		if ((leftMax != RBTreeNode.nil) && (rightMax != RBTreeNode.nil)) {
+		// Return node with higher balance if both are not nil
+		if ((!leftMax.isNil()) && (!rightMax.isNil())) {
 			return (leftMax.getValue().getBalance() > rightMax.getValue().getBalance()) ? leftMax : rightMax;
 		}
-
-		return (leftMax != RBTreeNode.nil) ? leftMax : (rightMax != RBTreeNode.nil) ? rightMax : RBTreeNode.nil;
+		
+		// Return non-nil node if exists, otherwise return nil
+		return !leftMax.isNil() ? leftMax : !rightMax.isNil() ? rightMax : RBTreeNode.nil;
 	}
 
 	/**
@@ -32,7 +34,7 @@ public class RBTree {
 	public static String negativeBalances(RBTreeNode node) {
 
 		// Recursion stop point
-		if (node == RBTreeNode.nil) {
+		if (node.isNil()) {
 			return "";
 		}
 
@@ -49,11 +51,17 @@ public class RBTree {
 	private static void setMax(RBTreeNode node) {
 		RBTreeNode childMax = getChildMax(node);
 
-		// Check root's max against children's max
-		if (childMax == RBTreeNode.nil) {
+		// No children, current node is max in subtree
+		if (childMax.isNil()) {
 			node.setMax(node);
-		} else {
+		}
+		// Check root's max against children's max
+		else {
 			node.setMax((node.getValue().getBalance() > childMax.getValue().getBalance()) ? node : childMax);
+		}
+		
+		if (!node.getParent().isNil()) {
+			setMax(node.getParent());
 		}
 	}
 
@@ -67,14 +75,14 @@ public class RBTree {
 	public static RBTreeNode successor(RBTreeNode node) {
 
 		// If node has a right son get the minimum node of the right sub tree
-		if (node.getRight() != RBTreeNode.nil) {
+		if (node.hasRightSon()) {
 			return treeMinimum(node.getRight());
 		}
 
 		RBTreeNode successor = node.getParent(), tempNode = node;
 
 		// Iterate to the right in node parent's sub tree
-		while ((successor != RBTreeNode.nil) && (tempNode == successor.getRight())) {
+		while (!successor.isNil() && tempNode.isRightSon()) {
 			tempNode = successor;
 			successor = successor.getParent();
 		}
@@ -93,7 +101,7 @@ public class RBTree {
 		RBTreeNode min = node;
 
 		// Iterate to the left until NIL
-		while (min.getLeft() != RBTreeNode.nil) {
+		while (min.hasLeftSon()) {
 			min = min.getLeft();
 		}
 
@@ -125,7 +133,7 @@ public class RBTree {
 
 		// Init deletedNode with the node it self it has a nil son or with its
 		// successor otherwise
-		if ((node.getLeft() == RBTreeNode.nil) || (node.getRight() == RBTreeNode.nil)) {
+		if (!node.hasLeftSon() || !node.hasRightSon()) {
 			deletedNode = node;
 		} else {
 			deletedNode = successor(node);
@@ -133,7 +141,7 @@ public class RBTree {
 
 		// Init tempNode with the left son if not NIL, otherwise with right son
 		// of deletedNode
-		if (deletedNode.getLeft() != RBTreeNode.nil) {
+		if (deletedNode.hasLeftSon()) {
 			tempNode = deletedNode.getLeft();
 		} else {
 			tempNode = deletedNode.getRight();
@@ -144,14 +152,14 @@ public class RBTree {
 
 		// replace value of node with deletedNode if not the same
 		if (deletedNode != node) {
-			// Client temp = node.getValue();
+			Client temp = node.getValue();
 			node.setValue(deletedNode.getValue());
-			// y.setValue(temp);
 			node.setMax(deletedNode.getMax());
+			deletedNode.setValue(temp);
 		}
 
 		// Check if deletedNode was the root
-		if (deletedNode.getParent() == RBTreeNode.nil) {
+		if (!deletedNode.hasParent()) {
 			setRoot(tempNode);
 		} else {
 			// Replace the reference to deletedNode in the parent
@@ -164,10 +172,10 @@ public class RBTree {
 
 		// Handle max values
 		setMax(tempNode);
-		setMax(tempNode.getParent());
+		//setMax(tempNode.getParent());
 
 		// Call fixup if deletedNode is black
-		if (deletedNode.getColor() == RBTreeNodeColor.BLACK) {
+		if (deletedNode.isBlack()) {
 			deleteFixup(tempNode);
 		}
 
@@ -187,67 +195,54 @@ public class RBTree {
 		// node - x
 		RBTreeNode node = deletedNode;
 
-		// Continue fixup as long as node isn't root and isn't black
-		while ((node != root) && (node.getColor() == RBTreeNodeColor.BLACK)) {
+		// Continue fixup as long as node isn't root and is black
+		while ((node != root) && (node.isBlack())) {
 			// tempNode - y
 			RBTreeNode tempNode;
+			
+			boolean isLeft = node.isLeftSon();
+			
+			tempNode = node.getBrother();
 
-			if (node.isLeftSon()) {
-				tempNode = node.getParent().getRight();
-
-				if (tempNode.getColor() == RBTreeNodeColor.RED) {
-					tempNode.setColor(RBTreeNodeColor.BLACK);
-					node.getParent().setColor(RBTreeNodeColor.RED);
-					leftRotate(node.getParent());
-					tempNode = node.getParent().getRight();
-				}
-
-				if ((tempNode.getLeft().getColor() == RBTreeNodeColor.BLACK)
-						&& (tempNode.getRight().getColor() == RBTreeNodeColor.BLACK)) {
-					tempNode.setColor(RBTreeNodeColor.RED);
-					node = node.getParent();
+			if (tempNode.isRed()) {
+				tempNode.setBlack();
+				node.getParent().setRed();
+				
+				if (isLeft) {
+					leftRotate(node.getParent());			// Left if left son
+					tempNode = node.getParent().getRight(); // Get right son
 				} else {
-					if (tempNode.getRight().getColor() == RBTreeNodeColor.BLACK) {
-						tempNode.getLeft().setColor(RBTreeNodeColor.BLACK);
-						tempNode.setColor(RBTreeNodeColor.RED);
-						rightRotate(tempNode);
-						tempNode = node.getParent().getRight();
-					}
-
-					tempNode.setColor(node.getParent().getColor());
-					node.getParent().setColor(RBTreeNodeColor.BLACK);
-					tempNode.getRight().setColor(RBTreeNodeColor.BLACK);
-					leftRotate(node.getParent());
-					node = root;
+					rightRotate(node.getParent());			// Right if right son
+					tempNode = node.getParent().getLeft(); // Get left son
 				}
+			}
+
+			if (tempNode.getLeft().isBlack() && tempNode.getRight().isBlack()) {
+				tempNode.setRed();
+				node = node.getParent();
 			} else {
-				tempNode = node.getParent().getLeft();
-
-				if (tempNode.getColor() == RBTreeNodeColor.RED) {
-					tempNode.setColor(RBTreeNodeColor.BLACK);
-					node.getParent().setColor(RBTreeNodeColor.RED);
-					rightRotate(node.getParent());
-					tempNode = node.getParent().getLeft();
-				}
-
-				if ((tempNode.getRight().getColor() == RBTreeNodeColor.BLACK)
-						&& (tempNode.getLeft().getColor() == RBTreeNodeColor.BLACK)) {
-					tempNode.setColor(RBTreeNodeColor.RED);
-					node = node.getParent();
-				} else {
-					if (tempNode.getLeft().getColor() == RBTreeNodeColor.BLACK) {
-						tempNode.getRight().setColor(RBTreeNodeColor.BLACK);
-						tempNode.setColor(RBTreeNodeColor.RED);
-						leftRotate(tempNode);
-						tempNode = node.getParent().getLeft();
+				
+				if (isLeft) {
+					if (tempNode.getRight().isBlack()) {
+						tempNode.getLeft().setBlack();
+						tempNode.setRed();
+						rightRotate(tempNode);				// Right if left son
+						tempNode = node.getParent().getRight(); // Get right son
 					}
-
-					tempNode.setColor(node.getParent().getColor());
-					node.getParent().setColor(RBTreeNodeColor.BLACK);
-					tempNode.getLeft().setColor(RBTreeNodeColor.BLACK);
-					rightRotate(node.getParent());
-					node = root;
+				} else {
+					if (tempNode.getLeft().isBlack()) {
+						tempNode.getRight().setBlack();
+						tempNode.setRed();
+						leftRotate(tempNode);				// Left if right son
+						tempNode = node.getParent().getLeft(); // Get left son
+					}
 				}
+
+				tempNode.setColor(node.getParent().getColor());
+				node.getParent().setBlack();
+				tempNode.getRight().setBlack();
+				leftRotate(node.getParent()); // Right if left son
+				node = root;
 			}
 		}
 
@@ -270,7 +265,7 @@ public class RBTree {
 		RBTreeNode nodeParent = RBTreeNode.nil, tempNode = root;
 
 		// Find the right parent for the new node
-		while (tempNode != RBTreeNode.nil) {
+		while (!tempNode.isNil()) {
 			nodeParent = tempNode;
 
 			if (node.getKey() < tempNode.getKey()) {
@@ -284,7 +279,7 @@ public class RBTree {
 		node.setParent(nodeParent);
 
 		// Link the node as root or as a child to nodeParent
-		if (nodeParent == RBTreeNode.nil) {
+		if (nodeParent.isNil()) {
 			setRoot(node);
 		} else if (node.getKey() < nodeParent.getKey()) {
 			nodeParent.setLeft(node);
@@ -371,13 +366,13 @@ public class RBTree {
 		// Handle axis right side
 		axis.setRight(oldRight.getLeft());
 
-		if (oldRight.getLeft() != RBTreeNode.nil) {
+		if (!oldRight.getLeft().isNil()) {
 			oldRight.getLeft().setParent(axis);
 		}
 
 		oldRight.setParent(axis.getParent());
 
-		if (axis.getParent() == RBTreeNode.nil) {
+		if (axis.getParent().isNil()) {
 			setRoot(oldRight);
 		} else if (axis.isLeftSon()) {
 			axis.getParent().setLeft(oldRight);
@@ -405,13 +400,13 @@ public class RBTree {
 		// Handle axis left side		
 		axis.setLeft(oldLeft.getRight());
 
-		if (oldLeft.getRight() != RBTreeNode.nil) {
+		if (!oldLeft.getRight().isNil()) {
 			oldLeft.getRight().setParent(axis);
 		}
 
 		oldLeft.setParent(axis.getParent());
 
-		if (axis.getParent() == RBTreeNode.nil) {
+		if (axis.getParent().isNil()) {
 			setRoot(oldLeft);
 		} else if (axis.isRightSon()) {
 			axis.getParent().setRight(oldLeft);
@@ -439,7 +434,7 @@ public class RBTree {
 		RBTreeNode node = root;
 
 		// Iterate the tree by key to find the node
-		while ((node != RBTreeNode.nil) && (node.getKey() != accountNumber)) {
+		while (!node.isNil() && (node.getKey() != accountNumber)) {
 			if (accountNumber < node.getKey()) {
 				node = node.getLeft();
 			} else {
