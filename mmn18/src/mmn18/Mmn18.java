@@ -46,17 +46,33 @@ public class Mmn18 {
 			+	"- 6\n"
 			+	"? 25\n"
 			+	"? MINUS\n"
-			+	"? MAX\n";
+			+	"? MAX\n"
+			+	"+ JOHN DOE 023456789 16 1600\n"
+			+	"+ JOHN DOE 023456789 8 -5000\n"
+			+	"+ JOHN DOE 023456789 10 -600\n"
+			+	"+ JOHN DOE 023456789 6 1080\n"
+			+	"+ JOHN DOE 023456789 21 1500\n"
+			+	"+ JOHN DOE 023456789 30 1500\n"
+			+	"+ JOHN DOE 023456789 35 1500\n"
+			+	"+ JOHN DOE 023456789 33 1500\n"
+			+	"+ JOHN DOE 023456789 28 1500\n"
+			+	"+ 82 82 29 27 8\n"
+			+	"+ 38 83 83 29 9\n"
+			+	"+ 29 29 29 32 23\n"
+			+	"+ ba ba 31 31 31\n"
+			+ 	"- 10";
+		
+		input = upSeqAdd();
 		
 		for (String s : input.split("\n")) {
 			System.out.println(executeAction(s));
-		}
 
-		try {
-			tree.getRoot().printTree(System.out);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			try {
+				tree.getRoot().printTree(System.out);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		
 		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
@@ -223,5 +239,33 @@ public class Mmn18 {
 		}
 		
 		return retMsg;
+	}
+	
+	public static String upSeqAdd() {
+		return 	"+ JOHN DOE 123456789 1 300\n"
+			+	"+ JOHN DOE 023456789 2 2500\n"
+			+	"+ JOHN DOE 023456789 3 10000\n"
+			+	"+ JOHN DOE 023456789 4 6000\n"
+			+	"+ JOHN DOE 023456789 5 400\n"
+			+	"+ JOHN DOE 023456789 6 1600\n"
+			+	"+ JOHN DOE 023456789 7 -5000\n"
+			+	"+ JOHN DOE 023456789 8 -600\n"
+			+	"+ JOHN DOE 023456789 9 1080\n"
+			+	"+ JOHN DOE 023456789 10 400\n"
+			+	"+ JOHN DOE 023456789 11 1600\n"
+			+	"+ JOHN DOE 023456789 12 -5000\n"
+			+	"+ JOHN DOE 023456789 13 -600\n"
+			+	"+ JOHN DOE 023456789 14 1080\n"
+			+	"+ JOHN DOE 023456789 15 -5000\n"
+			+	"+ JOHN DOE 023456789 16 -600\n"
+			+	"+ JOHN DOE 023456789 17 1080\n"
+			+	"+ JOHN DOE 023456789 18 400\n"
+			+	"+ JOHN DOE 023456789 19 1600\n"
+			+	"+ JOHN DOE 023456789 20 -5000\n"
+			+	"+ JOHN DOE 023456789 21 -600\n"
+			+	"+ JOHN DOE 023456789 22 1080\n"
+			+	"+ JOHN DOE 023456789 23 -3000\n"
+			+	"+ JOHN DOE 023456789 24 -600\n"
+			+	"+ JOHN DOE 023456789 25 1080\n";
 	}
 }

@@ -49,6 +49,8 @@ public class RBTree {
 	 *            - The node to set max of
 	 */
 	private static void setMax(RBTreeNode node) {
+		if (node.isNil()) return;
+		
 		RBTreeNode childMax = getChildMax(node);
 
 		// No children, current node is max in subtree
@@ -199,7 +201,7 @@ public class RBTree {
 		while ((node != root) && (node.isBlack())) {
 			// tempNode - y
 			RBTreeNode tempNode;
-			
+						
 			boolean isLeft = node.isLeftSon();
 			
 			tempNode = node.getBrother();
@@ -241,12 +243,14 @@ public class RBTree {
 				tempNode.setColor(node.getParent().getColor());
 				node.getParent().setBlack();
 				tempNode.getRight().setBlack();
-				leftRotate(node.getParent()); // Right if left son
+				
+				if (isLeft)	leftRotate(node.getParent()); // Right if left son
+				else rightRotate(node.getParent());
 				node = root;
 			}
 		}
 
-		node.setColor(RBTreeNodeColor.BLACK);
+		node.setBlack();
 	}
 
 	/**
@@ -293,7 +297,7 @@ public class RBTree {
 		// Init new node and call fix up
 		node.setLeft(RBTreeNode.nil);
 		node.setRight(RBTreeNode.nil);
-		node.setColor(RBTreeNodeColor.RED);
+		node.setRed();
 		insertFixup(node);
 	}
 
@@ -307,52 +311,38 @@ public class RBTree {
 		RBTreeNode tempNode = node;
 
 		// Fix the nodes so there are no red parents to red children
-		while (tempNode.getParent().getColor() == RBTreeNodeColor.RED) {
+		while (tempNode.getParent().isRed()) {
+			
+			boolean isLeft = tempNode.getParent().isLeftSon();
+			
+			RBTreeNode uncleNode = tempNode.getUncle();
 
-			// Handle for left child, then right child
-			if (tempNode.getParent().isLeftSon()) {
-				// rightUncleNode - y	
-				RBTreeNode rightUncleNode = tempNode.getGrandpa().getRight();
-
-				if (rightUncleNode.getColor() == RBTreeNodeColor.RED) {
-					tempNode.getParent().setColor(RBTreeNodeColor.BLACK);
-					rightUncleNode.setColor(RBTreeNodeColor.BLACK);
-					tempNode.getGrandpa().setColor(RBTreeNodeColor.RED);
-					tempNode = tempNode.getGrandpa();
-				} else {
+			if (uncleNode.isRed()) {
+				tempNode.getParent().setBlack();
+				uncleNode.setBlack();
+				tempNode.getGrandpa().setRed();
+				tempNode = tempNode.getGrandpa();
+			} else {
+				if (isLeft) {
 					if (tempNode.isRightSon()) {
 						tempNode = tempNode.getParent();
 						leftRotate(tempNode);
 					}
-
-					tempNode.getParent().setColor(RBTreeNodeColor.BLACK);
-					tempNode.getGrandpa().setColor(RBTreeNodeColor.RED);
-					rightRotate(tempNode.getGrandpa());
-				}
-			} else {
-				// leftUncleNode - y	
-				RBTreeNode leftUncleNode = tempNode.getGrandpa().getLeft();
-
-				if (leftUncleNode.getColor() == RBTreeNodeColor.RED) {
-					tempNode.getParent().setColor(RBTreeNodeColor.BLACK);
-					leftUncleNode.setColor(RBTreeNodeColor.BLACK);
-					tempNode.getGrandpa().setColor(RBTreeNodeColor.RED);
-					tempNode = tempNode.getGrandpa();
 				} else {
 					if (tempNode.isLeftSon()) {
 						tempNode = tempNode.getParent();
 						rightRotate(tempNode);
 					}
-
-					tempNode.getParent().setColor(RBTreeNodeColor.BLACK);
-					tempNode.getGrandpa().setColor(RBTreeNodeColor.RED);
-					leftRotate(tempNode.getGrandpa());
 				}
+				tempNode.getParent().setBlack();
+				tempNode.getGrandpa().setRed();
+				if (isLeft) rightRotate(tempNode.getGrandpa());
+				else leftRotate(tempNode.getGrandpa());
 			}
 		}
 
 		// Make sure root stays BLACK
-		root.setColor(RBTreeNodeColor.BLACK);
+		root.setBlack();
 	}
 
 	/**
