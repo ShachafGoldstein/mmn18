@@ -8,25 +8,6 @@ package mmn18;
 public class RBTree {
 
 	/**
-	 * Get the max relative to children
-	 * 
-	 * @param node - current node to check against
-	 * @return - The max node
-	 */
-	private static RBTreeNode getChildMax(RBTreeNode node) {
-		RBTreeNode leftMax 	= node.getLeft().getMax(),
-				   rightMax = node.getRight().getMax();
-
-		// Return node with higher balance if both are not nil
-		if ((!leftMax.isNil()) && (!rightMax.isNil())) {
-			return (leftMax.getValue().getBalance() > rightMax.getValue().getBalance()) ? leftMax : rightMax;
-		}
-		
-		// Return non-nil node if exists, otherwise return nil
-		return !leftMax.isNil() ? leftMax : !rightMax.isNil() ? rightMax : RBTreeNode.nil;
-	}
-
-	/**
 	 * Return a string representation of negative balance nodes
 	 * @param node - The node to start from
 	 * @return - The string representation
@@ -40,31 +21,6 @@ public class RBTree {
 
 		return (node.getValue().getBalance() < 0 ? node.toString() : "") + negativeBalances(node.getLeft())
 				+ negativeBalances(node.getRight());
-	}
-
-	/**
-	 * Set the max of the given node
-	 *
-	 * @param node
-	 *            - The node to set max of
-	 */
-	private static void setMax(RBTreeNode node) {
-		if (node.isNil()) return;
-		
-		RBTreeNode childMax = getChildMax(node);
-
-		// No children, current node is max in subtree
-		if (childMax.isNil()) {
-			node.setMax(node);
-		}
-		// Check root's max against children's max
-		else {
-			node.setMax((node.getValue().getBalance() > childMax.getValue().getBalance()) ? node : childMax);
-		}
-		
-		if (!node.getParent().isNil()) {
-			setMax(node.getParent());
-		}
 	}
 
 	/**
@@ -156,7 +112,8 @@ public class RBTree {
 		if (deletedNode != node) {
 			Client temp = node.getValue();
 			node.setValue(deletedNode.getValue());
-			node.setMax(deletedNode.getMax());
+			//node.setMax(deletedNode.getMax());
+			node.setMax();
 			deletedNode.setValue(temp);
 		}
 
@@ -173,7 +130,7 @@ public class RBTree {
 		}
 
 		// Handle max values
-		setMax(tempNode);
+		tempNode.setMax();
 		//setMax(tempNode.getParent());
 
 		// Call fixup if deletedNode is black
@@ -292,7 +249,7 @@ public class RBTree {
 		}
 
 		// Calculate new max for parent
-		setMax(nodeParent);
+		nodeParent.setMax();
 
 		// Init new node and call fix up
 		node.setLeft(RBTreeNode.nil);
@@ -375,8 +332,8 @@ public class RBTree {
 		axis.setParent(oldRight);
 
 		// Calculate max values
-		setMax(axis);
-		setMax(oldRight);
+		axis.setMax();
+		//setMax(oldRight);
 	}
 
 	/**
@@ -409,8 +366,8 @@ public class RBTree {
 		axis.setParent(oldLeft);
 
 		// Calculate max values
-		setMax(axis);
-		setMax(oldLeft);
+		axis.setMax();
+		//setMax(oldLeft);
 	}
 
 	/**

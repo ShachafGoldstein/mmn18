@@ -286,7 +286,7 @@ public class RBTreeNode {
 	 * @param max
 	 *            the max node to set
 	 */
-	public void setMax(RBTreeNode max) {
+	private void setMax(RBTreeNode max) {
 		this.max = max;
 	}
 
@@ -336,5 +336,60 @@ public class RBTreeNode {
 	@Override
 	public String toString() {
 		return (this.isNil()) ? "NIL" : "" + value;
+	}
+
+	/**
+	 * Get the max node in children's subtrees (max node in tree excluding root)
+	 * 
+	 * @return - The max node
+	 */
+	private RBTreeNode getChildMax() {
+		RBTreeNode leftMax 	= this.getLeft().getMax(),
+				   rightMax = this.getRight().getMax();
+
+		// Return node with higher balance if both are not nil
+		if ((!leftMax.isNil()) && (!rightMax.isNil())) {
+			return (leftMax.getValue().getBalance() > rightMax.getValue().getBalance()) ? leftMax : rightMax;
+		}
+		
+		// Return non-nil node if exists, otherwise return nil
+		return !leftMax.isNil() ? leftMax : !rightMax.isNil() ? rightMax : RBTreeNode.nil;
+	}
+
+	/**
+	 * Save the maximum of the subtree and set parent's max
+	 * Recursion ends when parent is nil
+	 */
+	public void setMax() {
+		// Nil doesn't need to set max
+		if (!this.isNil()) {
+			RBTreeNode childMax = this.getChildMax();
+	
+			// No children, current node is max in subtree
+			if (childMax.isNil()) {
+				this.setMax(this);
+			}
+			// Check root's max against children's max
+			else {
+				this.setMax((this.getValue().getBalance() > childMax.getValue().getBalance()) ? this : childMax);
+			}
+		}
+		
+		// In some cases nil's parent is temporarily an existing node
+		// Still need to change parent node in case it is not nil itself
+		if (!this.getParent().isNil()) {
+			this.getParent().setMax();
+		}
+	}
+
+	/**
+	 * Add given value to balance and re-calculates max for subtree
+	 * 
+	 * @param value - The value to add (can be a negative number)
+	 */
+	public void addToBalance(long value) {
+		this.getValue().addToBalance(value);
+		
+		this.setMax();
 	}
 }

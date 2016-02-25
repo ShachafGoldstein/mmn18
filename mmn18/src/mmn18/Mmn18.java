@@ -62,7 +62,7 @@ public class Mmn18 {
 			+	"+ ba ba 31 31 31\n"
 			+ 	"- 10";
 		
-		input = upSeqAdd();
+		input = TestCases.decreasingInsertion + TestCases.increasingRemoval;
 		
 		for (String s : input.split("\n")) {
 			System.out.println(executeAction(s));
@@ -200,7 +200,7 @@ public class Mmn18 {
 		RBTreeNode node = tree.searchByKey(Long.parseLong(vars[2]));
 		
 		// Change client balance
-		node.getValue().addToBalance(Long.parseLong(vars[3]));
+		node.addToBalance(Long.parseLong(vars[3]));
 		
 		return String.format("Client %s(%d), with account %d, has changed its balance to %d",
 				node.getValue().getName(),
@@ -239,33 +239,5 @@ public class Mmn18 {
 		}
 		
 		return retMsg;
-	}
-	
-	public static String upSeqAdd() {
-		return 	"+ JOHN DOE 123456789 1 300\n"
-			+	"+ JOHN DOE 023456789 2 2500\n"
-			+	"+ JOHN DOE 023456789 3 10000\n"
-			+	"+ JOHN DOE 023456789 4 6000\n"
-			+	"+ JOHN DOE 023456789 5 400\n"
-			+	"+ JOHN DOE 023456789 6 1600\n"
-			+	"+ JOHN DOE 023456789 7 -5000\n"
-			+	"+ JOHN DOE 023456789 8 -600\n"
-			+	"+ JOHN DOE 023456789 9 1080\n"
-			+	"+ JOHN DOE 023456789 10 400\n"
-			+	"+ JOHN DOE 023456789 11 1600\n"
-			+	"+ JOHN DOE 023456789 12 -5000\n"
-			+	"+ JOHN DOE 023456789 13 -600\n"
-			+	"+ JOHN DOE 023456789 14 1080\n"
-			+	"+ JOHN DOE 023456789 15 -5000\n"
-			+	"+ JOHN DOE 023456789 16 -600\n"
-			+	"+ JOHN DOE 023456789 17 1080\n"
-			+	"+ JOHN DOE 023456789 18 400\n"
-			+	"+ JOHN DOE 023456789 19 1600\n"
-			+	"+ JOHN DOE 023456789 20 -5000\n"
-			+	"+ JOHN DOE 023456789 21 -600\n"
-			+	"+ JOHN DOE 023456789 22 1080\n"
-			+	"+ JOHN DOE 023456789 23 -3000\n"
-			+	"+ JOHN DOE 023456789 24 -600\n"
-			+	"+ JOHN DOE 023456789 25 1080\n";
 	}
 }
